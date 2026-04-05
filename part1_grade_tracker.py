@@ -1,181 +1,161 @@
-# task 1 - parse and clean student data
-
-raw_students = [
-    {"name": "  ayesha SHARMA  ", "roll": "101", "marks_str": "88, 72, 95, 60, 78"},
-    {"name": "ROHIT verma",       "roll": "102", "marks_str": "55, 68, 49, 72, 61"},
-    {"name": "  Priya Nair  ",    "roll": "103", "marks_str": "91, 85, 88, 94, 79"},
-    {"name": "karan MEHTA",       "roll": "104", "marks_str": "40, 55, 38, 62, 50"},
-    {"name": " Sneha pillai ",    "roll": "105", "marks_str": "75, 80, 70, 68, 85"},
+# 1: cleaning student data
+data = [
+ {"name": " Ayesha Sharma ", "roll": "101", "marks_str": "88, 72, 95, 60, 78"},
+ {"name": " Rohit Verma", "roll": "102", "marks_str": "55, 68, 49, 72, 61"},
+ {"name": " Priya Nair ", "roll": "103", "marks_str": "91, 85, 88, 94, 79"},
+ {"name": " Karan Mehta ", "roll": "104", "marks_str": "40, 55, 38, 62, 50"},
+ {"name": " Sneha Pillai ", "roll": "105", "marks_str": "75, 80, 70, 68, 85"},
 ]
+students = []
 
-cleaned_students = []
+for student in data:
+   # basic cleaning
+   name = student ["name"].strip().title()
+   roll = int(student["roll"])
+   # splitting the string and turning into ints
+   marks = [int(m) for m in student["marks_str"].split(", ")]
 
-for student in raw_students:
-    clean_name  = student["name"].strip().title()
-    clean_roll  = int(student["roll"])
-    clean_marks = [int(m) for m in student["marks_str"].split(", ")]
+   # creating a clean dictionary
+   info = {"name": name, "roll": roll, "marks": marks}
+   students.append(info)
 
-    cleaned = {
-        "name":  clean_name,
-        "roll":  clean_roll,
-        "marks": clean_marks
-    }
-    cleaned_students.append(cleaned)
+   # check if name is only letters
+   check_name = all(x.isalpha() for x in name.split())
+   valid_msg = "✓ Valid name" if check_name else "✗ Invalid name"
 
-    is_valid = all(word.isalpha() for word in clean_name.split())
-    validity = "✓ Valid name" if is_valid else "✗ Invalid name"
+   print("---")
+   print(f"Name: {name} | {valid_msg}")
+   print(f"Roll: {roll}")
+   print(f"Marks: {marks}")
 
-    print("======")
-    print(f"Student : {clean_name}   {validity}")
-    print(f"Roll No : {clean_roll}")
-    print(f"Marks   : {clean_marks}")
-    print("======")
+# special check for Roll 103
+for s in students:
+   if s["roll"] == 103:
+     print(f"\n[Roll 103] Upper: {s['name'].upper()}")
+     print(f"[Roll 103] Lower: {s['name'].lower()}")
 
-for s in cleaned_students:
-    if s["roll"] == 103:
-        print(f"\nStudent Roll 103 - ALL CAPS : {s['name'].upper()}")
-        print(f"Student Roll 103 - lowercase : {s['name'].lower()}")
+# 2: marks analysis
 
+print("\n*2: Analysing marks*")
 
-# task 2 - marks analysis
+st_name = "Ayesha Sharma"
+subs = ["Math", "Physics", "CS", "English", "Chemistry"]
+marks_val = [88, 72, 95, 60, 78]
 
-print("\n======")
-print("TASK 2 - Marks Analysis")
-print("======")
+# help function for grades
+def find_grade(marks):
+ if marks>= 90: return "A+"
+ if marks>= 80: return "A"
+ if marks>= 70: return "B"
+ if marks>= 60: return "C"
+ return "F"
 
-student_name = "Ayesha Sharma"
-subjects = ["Math", "Physics", "CS", "English", "Chemistry"]
-marks    = [88, 72, 95, 60, 78]
+print(f"\nReport for {st_name}:")
+for i in range(len(subs)):
+ g = find_grade(marks_val[i])
+ print(f"{subs[i]:<10}:{marks_val[i]}->({g})")
 
-def get_grade(score):
-    if score >= 90:
-        return "A+"
-    elif score >= 80:
-        return "A"
-    elif score >= 70:
-        return "B"
-    elif score >= 60:
-        return "C"
-    else:
-        return "F"
+# basic math
+total = sum(marks_val)
+avg = round(total / len(marks_val), 2)
+best = subs[marks_val.index(max(marks_val))]
+worst = subs[marks_val.index(min(marks_val))]
 
-print(f"\nGrade Report for {student_name}:")
-for subject, mark in zip(subjects, marks):
-    grade = get_grade(mark)
-    print(f"  {subject:<12} : {mark}  -> Grade: {grade}")
+print(f"\nTotal:{total}")
+print(f"Average:{avg}")
+print(f"Best in:{best} ({max(marks_val)})")
+print(f"Lowest in:{worst} ({min(marks_val)})")
 
-total   = sum(marks)
-average = round(total / len(marks), 2)
-highest_subject = subjects[marks.index(max(marks))]
-lowest_subject  = subjects[marks.index(min(marks))]
-
-print(f"\nTotal Marks   : {total}")
-print(f"Average Marks : {average}")
-print(f"Highest Score : {highest_subject} ({max(marks)})")
-print(f"Lowest Score  : {lowest_subject} ({min(marks)})")
-
-print("\n--- New Subject Entry System ---")
-print("Type 'done' to stop adding subjects.\n")
-
-new_subjects = []
-new_marks    = []
+print("\n-Add More Subjects-")
+extra_subs = []
+extra_marks = []
 
 while True:
-    subject_input = input("Enter subject name (or 'done' to stop): ").strip()
-    if subject_input.lower() == "done":
+    sub = input("Subject name (or 'done'):").strip()
+    if sub.lower() == "done":
         break
 
-    marks_input = input(f"Enter marks for {subject_input} (0-100): ").strip()
-
     try:
-        marks_value = float(marks_input)
-        if not (0 <= marks_value <= 100):
-            print("⚠ Warning: Marks must be between 0 and 100. Entry skipped.")
-            continue
-        new_subjects.append(subject_input)
-        new_marks.append(int(marks_value))
-        print(f"  ✓ Added {subject_input} with marks {int(marks_value)}")
+        m = int(input(f"Marks for {sub}:"))
+        if 0 <= m <= 100:
+            extra_subs.append(sub)
+            extra_marks.append(m)
+            print(f"Added {sub}!")
+        else:
+            print("Marks should be 0-100!")
     except ValueError:
-        print("⚠ Warning: Invalid input — please enter a number. Entry skipped.")
+        print("Please enter a number!")
 
-print(f"\nNew subjects added: {len(new_subjects)}")
+all_marks = marks_val + extra_marks
+new_avg = round(sum(all_marks) / len(all_marks), 2)
+print(f"Updated Average: {new_avg}")
 
-all_marks       = marks + new_marks
-updated_average = round(sum(all_marks) / len(all_marks), 2)
-print(f"Updated average across all subjects: {updated_average}")
+# 3: class summary
 
-
-# task 3 - class performance summary
-
-print("\n=====")
-print("TASK 3 - Class Performance Summary")
-print("=====")
+print("\n-3: CLASS SUMMARY-")
 
 class_data = [
-    ("Ayesha Sharma", [88, 72, 95, 60, 78]),
-    ("Rohit Verma",   [55, 68, 49, 72, 61]),
-    ("Priya Nair",    [91, 85, 88, 94, 79]),
-    ("Karan Mehta",   [40, 55, 38, 62, 50]),
-    ("Sneha Pillai",  [75, 80, 70, 68, 85]),
+ ("Ayesha Sharma", [88, 72, 95, 60, 78]),
+ ("Rohit Verma", [55, 68, 49, 72, 61]),
+ ("Priya Nair", [91, 85, 88, 94, 79]),
+ ("Karan Mehta", [40, 55, 38, 62, 50]),
+ ("Sneha Pillai", [75, 80, 70, 68, 85]),
 ]
+passed = 0
+failed = 0
+all_avgs = []
+topper = ""
+top_marks = 0
 
-print(f"\n{'Name':<18} | {'Average':^7} | Status")
-print("-" * 40)
-
-passed_count = 0
-failed_count = 0
-averages     = []
-topper_name  = ""
-topper_avg   = 0
-
-for name, m in class_data:
-    avg    = round(sum(m) / len(m), 2)
-    status = "Pass" if avg >= 60 else "Fail"
-    averages.append(avg)
-
-    if status == "Pass":
-        passed_count += 1
+for name, scores in class_data:
+    avg = round(sum(scores)/len(scores),2)
+    all_avgs.append(avg)
+    
+    if avg>=60:
+        result="Pass"
+        passed+=1
     else:
-        failed_count += 1
+        result="Fail"
+        failed+=1
+    
+    if avg > top_marks:
+        top_marks=avg
+        topper=name
+    
+    print(f"{name:<18}|{avg:<7}|{result}")
 
-    if avg > topper_avg:
-        topper_avg  = avg
-        topper_name = name
+class_avg = round(sum(all_avgs)/len(all_avgs),2)
+print(f"\nPassed:{passed}|Failed:{failed}")
+print(f"Topper:{topper}({top_marks})")
+print(f"Class Average:{class_avg}")
 
-    print(f"{name:<18} | {avg:^7.2f} | {status}")
+# 4: string work
 
-class_average = round(sum(averages) / len(averages), 2)
+print("\n-4:String Work-")
 
-print(f"\nStudents Passed : {passed_count}")
-print(f"Students Failed : {failed_count}")
-print(f"Class Topper    : {topper_name} (Average: {topper_avg})")
-print(f"Class Average   : {class_average}")
+txt = "python is a versatile language. It supports object-oriented, functional, and procedural programming. python is widely used in data science and machine learning."
 
+# cleaning the text
+clean_txt = txt.strip()
+print(f"\nCleaned:\n{clean_txt}")
+print(f"\nTitle Case:\n{clean_txt.title()}")
 
-# task 4 - string manipulation
+# counting & replacing
+count_py = clean_txt.count("python")
+print(f"\n'python' appears {count_py} times.")
 
-print("\n=====")
-print("TASK 4 - String Manipulation")
-print("======")
+new_txt = clean_txt.replace("python", "Python 🐍")
+print(f"\nUpdated text:\n{new_txt}")
 
-essay = "  python is a versatile language. it supports object oriented, functional, and procedural programming. python is widely used in data science and machine learning.  "
+# splitting into sentences
+bits = clean_txt.split(". ")
+print("\nSentence list:")
+print(bits)
 
-clean_essay = essay.strip()
-print(f"\nStep 1 - Stripped Essay:\n{clean_essay}")
+print("\nNumbered list:")
+for num, line in enumerate(bits, 1):
+    line = line.strip()
+    if not line.endswith("."):
+        line += "."
+    print(f"{num}. {line}")
 
-print(f"\nStep 2 - Title Case:\n{clean_essay.title()}")
-
-python_count = clean_essay.count("python")
-print(f"\nStep 3 - Count of 'python': {python_count}")
-
-replaced = clean_essay.replace("python", "Python 🐍")
-print(f"\nStep 4 - Replaced:\n{replaced}")
-
-sentences = clean_essay.split(". ")
-print(f"\nStep 5 - Sentences list:\n{sentences}")
-
-print("\nStep 6 - Numbered Sentences:")
-for i, sentence in enumerate(sentences, 1):
-    if not sentence.endswith("."):
-        sentence = sentence + "."
-    print(f"{i}. {sentence}")
